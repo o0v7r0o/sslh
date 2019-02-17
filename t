@@ -131,6 +131,7 @@ sub test_probes {
             'tinc' => { data => "0 hello" },
             'xmpp' => {data => "I should get a real jabber connection initialisation here" },
             'adb' => { data => "CNXN....................host:..." },
+            'rsync' => { data => "\@RSYNCD: TEST" },
             'anyprot' => {data => "hello anyprot this needs to be longer than xmpp and adb which expect about 50 characters, which I all have to write before the timeout!" },
         );
 

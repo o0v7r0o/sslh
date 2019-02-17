@@ -41,6 +41,7 @@ static int is_http_protocol(const char *p, int len, struct sslhcfg_protocols_ite
 static int is_tls_protocol(const char *p, int len, struct sslhcfg_protocols_item*);
 static int is_adb_protocol(const char *p, int len, struct sslhcfg_protocols_item*);
 static int is_socks5_protocol(const char *p, int len, struct sslhcfg_protocols_item*);
+static int is_rsync_protocol(const char *p, int len, struct sslhcfg_protocols_item*);
 static int is_true(const char *p, int len, struct sslhcfg_protocols_item* proto) { return 1; }
 
 /* Table of protocols that have a built-in probe
@@ -56,6 +57,7 @@ static struct protocol_probe_desc builtins[] = {
     { "ssl",        is_tls_protocol },
     { "adb",        is_adb_protocol },
     { "socks5",     is_socks5_protocol },
+    { "rsync",      is_rsync_protocol },
     { "anyprot",    is_true }
 };
 
@@ -308,6 +310,17 @@ static int is_socks5_protocol(const char *p_in, int len, struct sslhcfg_protocol
             return PROBE_NEXT;
     }
     return PROBE_MATCH;
+}
+/* Awaiting a greeting                                          */
+/*  @RSYNCD: <version>.<subprotocol>                            */
+/* For details refer to:                                        */
+/* https://download.samba.org/pub/unpacked/rsync/csprotocol.txt */
+static int is_rsync_protocol(const char *p, int len, struct sslhcfg_protocols_item* proto)
+{
+    if (len < 8)
+        return PROBE_AGAIN;
+
+    return !strncmp(p, "@RSYNCD:", 8);
 }
 
 static int regex_probe(const char *p, int len, struct sslhcfg_protocols_item* proto)
